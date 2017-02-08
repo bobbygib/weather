@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link  rel='stylesheet' type='text/css' href='https://fonts.googleapis.com/css?family=Coming+Soon'>
+	<script
+		src="https://code.jquery.com/jquery-3.1.1.js"
+		integrity="sha256-16cdPddA6VdVInumRGo6IbivbERE8p7CQR3HzTBuELA="
+		crossorigin="anonymous"
+	></script>
+	<script>
+
+		$.get('http://api.geonames.org/weatherJSON?north=41&south=39&east=-104&west=-106&username=ertyseidohl', function(res) {
+			console.log(res.weatherObservations);
+			var data = res.weatherObservations;
+			console.log(data);
+			$(document).ready(function(){
+				for(var i = 0; i<data.length; i++){
+					var weather = data[i];
+					var templateClone = $('#weather_template').children().first().clone();
+					var station = stationName(weather.stationName) 
+					templateClone.find('.stationName').text(station);
+					templateClone.find('.temperature').text("Temp : " +	weather.temperature + " °C");
+					templateClone.find('.humidity').text("Humidity : " + weather.humidity + "%");
+					if(weather.windSpeed){
+						templateClone.find('.windSpeed').text("Wind speed : " + weather.windSpeed + "mph"); 
+					} else {
+						templateClone.find(".windSpeed").hide();
+					} 
+					if(weather.windDirection){
+					templateClone.find('.windDirection').text("Wind Direction : " + weather.windDirection + "°");
+					} else { 
+						templateClone.find(".windDirection").hide();
+					}
+
+					$('#weather_stations').append(templateClone);
+
+				}
+			})
+		});	
+
+		function stationName (original) {	
+			var names = {
+				"BOULDER MUNI" : "Boulder",
+				"BERTHOUD PASS" : "Berthoud Pass",
+				"ERIE MUNI" : "Erie",
+				"LONGMONT/VBRAND" : "Longmont",
+				"Denver Nexrad" : "Denver",
+				"Elbert Mountain, Monument Pass" : "Mt. Elbert",
+				"Greeley, Greeley-Weld County Airport" : "Greeley",
+				"Wilkerson Pass" : "Wilkerson Pass",
+				"Denver, Centennial Airport" : "Centennial Airport",
+				"Denver, Denver International Airport" : "DIA"
+			}
+			if(names[original]) {
+				return names[original];
+			}
+			return original
+		}	
+
+		function getWindDir(dir) {
+			if (dir > 315 || dir <= 45) {
+					return "North"; 
+			} else if (dir > 45 && dir <= 135){
+					return "East";
+			} else if (dir > 135 && dir <=225){
+					return "South";
+			} else if (dir > 225 &&  dir <= 315) {
+				return "West";
+			}
+		}
+		// TODO: using the response data from api.geonames.org, build an HTML page that displays the weather to the user in a "fun" way
+	</script>
+	<style>
+	#weather_stations{
+		color: white;
+
+	}
+
+	#weather_template {
+		display:none;
+	}
+
+	#container{
+		background-image:url('http://freebigpictures.com/wp-content/uploads/2009/09/cumulus-clouds.jpg');
+		float:left;
+		position: relative;
+		width:320px;
+		height:200px;
+		border:2px solid grey;
+		border-radius: 2%;
+		font-family:'Coming Soon', sans-serif;
+		display:inline;
+		margin: 2px 0 10px 10px;
+
+
+	}
+
+	h4{
+		margin: 2px 0 0 15px;
+
+
+	}
+
+	h3{
+		margin: 2px 0 0 10px;
+		text-decoration: underline;
+
+
+	}
+
+	h1{
+		font-family:'Coming Soon', sans-serif;
+		margin-left:13px;
+		font-size:222%;
+
+	}
+
+	</style>
+</head>
+<body>
+	<h1 id="title">Temperature in the Boulder/Denver Area</h1>
+	<div id="weather_template">
+		<div id ="container">
+			<h3 class ="stationName"></h3>
+			<h4 class="temperature"></h4>
+			<h4 class="humidity"></h4>
+			<h4 class="windSpeed"></h4>
+			<h4 class="windDirection"></h4>
+		</div>
+	</div>
+
+	<div id="weather_stations"></div>
+	
+</body>
+</html>
